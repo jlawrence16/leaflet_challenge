@@ -10,27 +10,45 @@ let myMap = L.map("map", {
   }).addTo(myMap);
   
   // Use this link to get the GeoJSON data.
-  let link = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson";
+  let link = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojson";
   
 
   // Getting our GeoJSON data
   d3.json(link).then(function(data) {
+    let features = data.features;
     
     // Creating a GeoJSON layer with the retrieved data
     let circleLayer = L.geoJson(data, {
         // Define the style for the GeoJSON features
         style: function(features) {
+            let colour;
+            // Determine the color based on a feature's property
+            if (features.geometry.coordinates[2] > 90) {
+                colour = 'red';
+            } else if (features.geometry.coordinates[2] > 70) {
+                colour = 'orange';
+            } else if (features.geometry.coordinates[2] > 50) {
+                colour = 'yellow';
+            } else if (features.geometry.coordinates[2] > 30) {
+                colour = 'green';
+            } else if (features.geometry.coordinates[2] > 10) {
+                colour = 'blue';
+            }  else {
+                colour = 'violet';
+            }
             return {
-                fillColor: 'purple',
+                fillColor: colour,
                 fillOpacity: 0.5,
-                color: 'black',
+                color: colour,
                 weight: 1
             };
         },
      // Add circles to the GeoJSON features
         pointToLayer: function(features, coord) {
         return L.circle(coord, {
-            radius: 1000000, // Set the radius of the circle
+            radius: features.properties.mag * 50000, // Set the radius of the circle
+        
+        
         })}})
     
 // Add the GeoJSON layer to the map

@@ -24,17 +24,17 @@ let myMap = L.map("map", {
             let color;
             // Determine the color based on a feature's property
             if (features.geometry.coordinates[2] > 90) {
-                color = 'red';
+                color = '#ea2c2c';
             } else if (features.geometry.coordinates[2] > 70) {
-                color = 'orange';
+                color = '#ea822c';
             } else if (features.geometry.coordinates[2] > 50) {
-                color = 'yellow';
+                color = '#ee9c00';
             } else if (features.geometry.coordinates[2] > 30) {
-                color = 'green';
+                color = '#eecc00';
             } else if (features.geometry.coordinates[2] > 10) {
-                color = 'blue';
+                color = '#d4ee00';
             }  else {
-                color = 'violet';
+                color = '#98ee00';
             }
             return {
                 fillColor: color,
@@ -48,52 +48,44 @@ let myMap = L.map("map", {
         return L.circle(coord, {
             radius: features.properties.mag * 30000, // Set the radius of the circle
         
-        
+        // Add pop up to each marker showing location, magnitue and depth of each quake
         }).bindPopup(`<h3>Magnitue: ${features.properties.mag}</h3> 
                     <h3>Depth: ${features.geometry.coordinates[2]}</h3> 
                     <h3>Location: ${features.properties.place}</h3>`)
     }})
     
-// Add the GeoJSON layer to the map
+    // Add the GeoJSON layer to the map
 circleLayer.addTo(myMap);
-});
 
-// Add a legend to the map
-// Define the legend categories and colors
-const legendItems = [
-    { label: "90>", color: "#FF0000" },
-    { label: "70-90", color: "#FF0000" },
-    { label: "50-70", color: "#FF0000" },
-    { label: "30-50", color: "#FF0000" },
-    { label: "10-30", color: "#FF0000" },
-    { label: "<10", color: "#FF0000" }
-  ];
-  
-  // Create the legend element
-  const legend = L.control({ position: "bottomright" });
-  
-  // Define the content of the legend
-  legend.onAdd = function(map) {
-    const div = L.DomUtil.create("div", "legend");
-    
-    // Create the legend items
-    for (let item of legendItems) {
-      const label = item.label;
-      const color = item.color;
-      
-      const marker = L.divIcon({
-        className: "legend-marker",
-        html: `<div style="background-color: ${color};"></div>`
-      });
-      
-      const listItem = L.DomUtil.create("div", "legend-item");
-      listItem.innerHTML = `${marker}<span>${label}</span>`;
-      
-      div.appendChild(listItem);
-    }
-    
+// Add legend
+
+// Set up and position legend
+let legend = L.control({
+    position: "bottomright"
+  });
+
+  // Add legend componenets, depth and color
+  legend.onAdd = function () {
+    let div = L.DomUtil.create("div", "info legend");
+
+    let depths = [-10, 10, 30, 50, 70, 90];
+    let colors = [
+      "#98ee00",
+      "#d4ee00",
+      "#eecc00",
+      "#ee9c00",
+      "#ea822c",
+      "#ea2c2c"
+    ];
+
+    // Looping through depths and depth text and color.
+    for (let i = 0; i < depths.length; i++) {
+      div.innerHTML += "<i style='background: " + colors[i] + "'></i> "
+        + depths[i] + (depths[i + 1] ? "&ndash;" + depths[i + 1] + "<br>" : "+");
+        }
     return div;
-  };
+    };
   
   // Add the legend to the map
   legend.addTo(myMap);
+});  
